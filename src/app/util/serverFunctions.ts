@@ -67,7 +67,7 @@ export const deleteComment = async (id: string) => {
 // this is the user api yrl error
 export const getUser = async () => {
   if (typeof window === "undefined") {
-    return { data: null }; // or some default value
+    return { data: null };
   }
 
   try {

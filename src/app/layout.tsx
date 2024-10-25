@@ -1,17 +1,18 @@
 import "@/app/globals.css";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Poppins } from "next/font/google";
 import Navbar from "./components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "./util/QueryProvider";
 import JotaiProvider from "./util/JotaiProvider";
 import type { Metadata, Viewport } from "next";
-import Script from 'next/script';
+import Script from "next/script";
 
 const APP_NAME = "Review It";
 const APP_DEFAULT_TITLE = "Review It";
 const APP_TITLE_TEMPLATE = "%s - Review It";
-const DEFAULT_OG_IMAGE = "https://res.cloudinary.com/dhglzlaqf/image/upload/v1724077586/reviewit/logo_eqake5.png";
+const DEFAULT_OG_IMAGE =
+  "https://res.cloudinary.com/dhglzlaqf/image/upload/v1724077586/reviewit/logo_eqake5.png";
 const APP_DESCRIPTION =
   "Review It is a website where you can share and read reviews on anything. It is easy, fun, and free to use.";
 
@@ -84,10 +85,7 @@ export default function RootLayout({
     <JotaiProvider>
       <ClerkProvider>
         <QueryProvider>
-          <html
-            className="bg-myTheme-lightbg "
-            lang="en"
-          >
+          <html className="bg-myTheme-lightbg " lang="en">
             <head>
               <meta
                 name="viewport"
@@ -109,13 +107,10 @@ export default function RootLayout({
           `}
               </Script>
             </head>
-            <body
-              className={`${poppins.className} bg-myTheme-lightbg  `}
-            >
+            <body className={`${poppins.className} bg-myTheme-lightbg  `}>
               <Navbar>{children}</Navbar>
-              <ReactQueryDevtools initialIsOpen={true} />
+              <ReactQueryDevtools initialIsOpen={false} />
             </body>
-
           </html>
         </QueryProvider>
       </ClerkProvider>
