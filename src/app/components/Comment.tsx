@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import OptionsMenu from "./CommentOptionsMenu";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
+
 interface CommentProps {
   comment: iComment;
   onReply: (parentId: string, body: string) => Promise<void>;
@@ -56,7 +58,6 @@ const Comment: React.FC<CommentProps> = ({
 
   const handleReply = async () => {
     if (comment.id && canReply) {
-      await onReply(comment.id, replyBody);
       const newReply: iComment = {
         id: Date.now().toString(),
         body: replyBody,
@@ -67,12 +68,26 @@ const Comment: React.FC<CommentProps> = ({
         userId: userId as string,
         isDeleted: false,
         reviewId: comment.reviewId,
-        replies: comment.replies || [],
+        replies: [],
       };
-      setReplies([...replies, newReply]);
+
+      // Optimistically update the UI
+      const updatedReplies = [...replies, newReply];
+      setReplies(updatedReplies);
       setIsReplying(false);
       setReplyBody("");
       setShowReplies(true);
+
+      try {
+        // Call the API
+        await onReply(comment.id, replyBody);
+      } catch (error) {
+        // If the API call fails, revert the optimistic update
+        setReplies(replies);
+        setIsReplying(true);
+        setReplyBody(replyBody);
+        toast.error("Failed to add reply. Please try again.");
+      }
     }
   };
 

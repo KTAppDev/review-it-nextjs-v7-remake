@@ -96,66 +96,15 @@ const ExpandedReview = ({
   });
 
   const replyMutation = useMutation({
-    mutationFn: async (reply: iComment) => {
-      const data = await createReplyOnComment(reply);
+    mutationFn: async (reply: { parentId: string, body: string }) => {
+      const data = await createReplyOnComment({
+        ...comment,
+        ...reply,
+        id: Date.now().toString(),
+        user: currentUser,
+      });
       return data;
-    },
-    onMutate: (newReply: iComment) => {
-      queryClient.cancelQueries({ queryKey: ["review", reviewId] });
-      const previousReview = queryClient.getQueryData<iReview>([
-        "review",
-        reviewId,
-      ]);
-
-      let isFirstReply = false;
-
-      queryClient.setQueryData<iReview | undefined>(
-        ["review", reviewId],
-        (old) => {
-          if (!old) return old;
-          const updatedComments =
-            old.comments?.map((comment) => {
-              if (comment.id === newReply.parentId) {
-                if (!comment.replies || comment.replies.length === 0) {
-                  isFirstReply = true;
-                }
-                return {
-                  ...comment,
-                  replies: [...(comment.replies || []), newReply],
-                };
-              }
-              return comment;
-            }) || [];
-
-          return {
-            ...old,
-            comments: updatedComments,
-          };
-        },
-      );
-
-      return { previousReview, isFirstReply };
-    },
-    onError: (
-      err,
-      newReply,
-      context:
-        | { previousReview: iReview | undefined; isFirstReply: boolean }
-        | undefined,
-    ) => {
-      if (context?.previousReview) {
-        queryClient.setQueryData<iReview>(
-          ["review", reviewId],
-          context.previousReview,
-        );
-      }
-    },
-    onSettled: (_, __, ___, context) => {
-      // Only refetch if it's the first reply
-      if (context?.isFirstReply) {
-        queryClient.invalidateQueries({ queryKey: ["review", reviewId] });
-      }
-    },
+    }
   });
 
   const handleCommentSubmit = useCallback(
@@ -173,15 +122,13 @@ const ExpandedReview = ({
 
   const handleReply = useCallback(
     async (parentId: string, body: string) => {
-      const newReply = {
-        ...comment,
-        body,
-        parentId,
-        id: Date.now().toString(),
-      };
-      replyMutation.mutate(newReply);
+      try {
+        await replyMutation.mutateAsync({ parentId, body });
+      } catch (error) {
+        console.error('Failed to add reply:', error);
+      }
     },
-    [replyMutation, comment],
+    [replyMutation]
   );
 
   const handleEdit = async (commentId: string, body: string) => {
