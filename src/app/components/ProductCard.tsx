@@ -262,7 +262,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              {options.showClaimThisProduct && !amITheOwner && (
+              {options.showClaimThisProduct && !amITheOwner && currentProduct && (
                 <ClaimProductComponent product={currentProduct} />
               )}
               {options.showWriteReview && (
