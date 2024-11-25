@@ -1,7 +1,7 @@
 "use client";
 import { iProduct, iReview } from "@/app/util/Interfaces";
 import Image from "next/legacy/image";
-import RatingModuleMini from "./RatingModuleMini";
+import RatingModuleReadOnly from "./RatingModuleReadOnly";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getReviews } from "../util/serverFunctions";
@@ -116,7 +116,7 @@ const ProductCardSlim: React.FC<ProductCardProps> = ({ product, options }) => {
                       }`}>
                         {roundedRatingOneDecimalPlace}
                       </span>
-                      <RatingModuleMini
+                      <RatingModuleReadOnly
                         name={product.id!}
                         rating={roundedRating}
                         size={options.size}
