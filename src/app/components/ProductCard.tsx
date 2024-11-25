@@ -140,7 +140,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {/* Image Section */}
             {currentProduct?.display_image && (
               <div className="flex-shrink-0">
-                <div className="relative w-full sm:w-24 h-24 rounded-lg overflow-hidden">
+                <div className="relative aspect-square w-32 sm:w-24 rounded-lg overflow-hidden">
                   <Image
                     src={currentProduct.display_image}
                     alt={`${currentProduct.name} Image`}
