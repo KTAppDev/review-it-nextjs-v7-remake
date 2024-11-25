@@ -86,18 +86,16 @@ const InstallPWA: React.FC = () => {
   }, [deferredPrompt]);
 
   return (
-    <section className="flex justify-center w-full min-h-screen py-12 md:py-24 lg:py-32 bg-gray-100">
-      <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
+    <section className="flex justify-center w-full py-6 bg-gray-100 rounded-lg my-4">
+      <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
         {!isStandalone ? (
           <>
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                Experience Our Web App as a PWA
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">
+                Install Our App
               </h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Install our Progressive Web App for a faster, more responsive
-                experience - with offline capabilities and easy access from your
-                home screen.
+              <p className="mx-auto max-w-[600px] text-gray-500 text-sm md:text-base">
+                Get a faster experience with offline capabilities by installing our app to your device.
               </p>
             </div>
             {isInstallable && deferredPrompt && (
@@ -112,9 +110,8 @@ const InstallPWA: React.FC = () => {
               </Button>
             )}
             {!isInstallable && (
-              <p className="text-yellow-600">
-                PWA installation is not supported in your current browser or the
-                app is already installed.
+              <p className="text-yellow-600 text-sm">
+                PWA installation is not supported in your current browser or the app is already installed.
               </p>
             )}
             {installError && (
@@ -135,13 +132,12 @@ const InstallPWA: React.FC = () => {
           </>
         ) : (
           <>
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">
                 Welcome to Our PWA!
               </h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                You are using the installed version of our app. Enjoy the
-                enhanced experience!
+              <p className="mx-auto max-w-[600px] text-gray-500 text-sm md:text-base">
+                You are using the installed version of our app. Enjoy the enhanced experience!
               </p>
             </div>
           </>
