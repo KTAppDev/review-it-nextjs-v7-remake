@@ -82,12 +82,12 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
       initial="hidden"
       animate="visible"
       whileHover="hover"
-      className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition-all duration-150 w-full relative group"
+      className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-150 w-full relative group"
     >
       {/* Header Section */}
-      <div className="flex items-start space-x-4 mb-4">
+      <div className="flex items-start space-x-3 sm:space-x-4 mb-4">
         <Link href={`/userprofile/${review?.user?.id}`} className="flex-shrink-0">
-          <div className="relative w-12 h-12">
+          <div className="relative w-10 h-10 sm:w-12 sm:h-12">
             <Image
               src={review.user?.avatar!}
               alt={`${review.user?.userName}'s avatar`}
@@ -98,15 +98,15 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
         </Link>
         
         <div className="flex-grow min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex flex-wrap items-center gap-2 mb-1">
             <Link
               href={`/userprofile/${review?.user?.id}`}
-              className="font-semibold text-myTheme-reviewBlue hover:underline truncate max-w-[150px]"
+              className="font-semibold text-myTheme-reviewBlue hover:underline truncate max-w-[120px] sm:max-w-[150px]"
             >
               @{review.user?.userName}
             </Link>
             <span className="text-gray-400">•</span>
-            <span className="text-sm text-gray-500" title={dayjs(review?.createdDate?.toString()).format("MMMM D, YYYY h:mm A")}>
+            <span className="text-xs sm:text-sm text-gray-500" title={dayjs(review?.createdDate?.toString()).format("MMMM D, YYYY h:mm A")}>
               {dayjs(review?.createdDate).fromNow()}
             </span>
           </div>
@@ -126,13 +126,13 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
       <div className="mb-4">
         <Link
           href={`/reviews?id=${review?.product?.id}`}
-          className="inline-flex items-center gap-2 text-lg font-medium text-gray-900 hover:text-myTheme-primary transition-colors"
+          className="inline-flex items-center gap-2 text-base sm:text-lg font-medium text-gray-900 hover:text-myTheme-primary transition-colors"
         >
           {review.product?.name}
         </Link>
         <div className="flex flex-wrap items-center gap-1.5 mt-2">
           <Tag size={12} className="text-gray-400" />
-          {review.product?.tags.slice(0, 3).map((tag, index) => (
+          {review.product?.tags.slice(0, 2).map((tag, index) => (
             <Badge 
               key={index} 
               variant="secondary" 
@@ -141,9 +141,9 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
               {tag}
             </Badge>
           ))}
-          {review.product?.tags?.length! > 3 && (
+          {review.product?.tags?.length! > 2 && (
             <span className="text-xs text-gray-500">
-              +{review.product?.tags?.length! - 3} more
+              +{review.product?.tags?.length! - 2} more
             </span>
           )}
         </div>
@@ -179,38 +179,38 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
       )}
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-100">
+        <div className="flex flex-wrap items-center gap-4">
           <Link
             href={`/fr?id=${review?.id}&productid=${review?.product?.id}`}
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-myTheme-primary transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-myTheme-primary transition-colors"
           >
             <MessageSquare size={16} />
-            <span>Comment</span>
+            <span className="hidden sm:inline">Comment</span>
           </Link>
           
           <button
             onClick={handleBookmark}
-            className={`inline-flex items-center gap-2 text-sm transition-colors ${
+            className={`inline-flex items-center gap-1.5 text-sm transition-colors ${
               isBookmarked ? 'text-myTheme-primary' : 'text-gray-500 hover:text-myTheme-primary'
             }`}
           >
             <Bookmark size={16} className={isBookmarked ? 'fill-current' : ''} />
-            <span>Save</span>
+            <span className="hidden sm:inline">Save</span>
           </button>
           
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-myTheme-primary transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-myTheme-primary transition-colors"
           >
             <Share2 size={16} />
-            <span>Share</span>
+            <span className="hidden sm:inline">Share</span>
           </button>
         </div>
 
         <Link
           href={`/fr?id=${review?.id}&productid=${review?.product?.id}`}
-          className="bg-myTheme-primary text-white text-sm font-medium hover:bg-myTheme-secondary px-4 py-2 rounded-full transition-colors duration-200"
+          className="bg-myTheme-primary text-white text-sm font-medium hover:bg-myTheme-secondary px-4 py-2 rounded-full transition-colors duration-200 text-center"
         >
           Full review
         </Link>
