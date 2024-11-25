@@ -10,7 +10,20 @@ import LoadingSpinner from "./LoadingSpinner";
 import VerticalLinks from "./VerticalLinks";
 import { useRouter } from "next/navigation";
 import ClaimProductComponent from "./ClaimProductComponent";
-import { MdEmail, MdPhone, MdLanguage, MdAccessTime, MdLocationOn, MdCalendarToday, MdEdit, MdReport } from 'react-icons/md';
+import { motion } from "framer-motion";
+import { 
+  MdEmail, 
+  MdPhone, 
+  MdLanguage, 
+  MdAccessTime, 
+  MdLocationOn, 
+  MdCalendarToday, 
+  MdEdit, 
+  MdReport,
+  MdVerified
+} from 'react-icons/md';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   reviews?: iReview[] | null;
@@ -43,8 +56,7 @@ const ProductCardExtended: React.FC<ProductCardProps> = ({
   product,
 }) => {
   const router = useRouter();
-  const currentProduct =
-    reviews && reviews.length > 0 ? reviews[0].product : product;
+  const currentProduct = reviews && reviews.length > 0 ? reviews[0].product : product;
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["reviews", currentProduct?.id],
@@ -56,113 +68,203 @@ const ProductCardExtended: React.FC<ProductCardProps> = ({
   const allReviews = reviews || data?.data.reviews || [];
 
   if (isLoading) return <LoadingSpinner />;
-  if (isError) return <p>{error.message}</p>;
+  if (isError) return <p className="text-sm text-red-500">{error.message}</p>;
 
-  let { roundedRating, roundedRatingOneDecimalPlace, numberOfReviews } =
+  const { roundedRating, roundedRatingOneDecimalPlace, numberOfReviews } =
     calculateAverageReviewRating(allReviews) as unknown as iCalculatedRating;
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut"
+      }
+    },
+    hover: {
+      y: -2,
+      transition: {
+        duration: 0.15,
+        ease: "easeInOut"
+      }
+    }
+  };
+
   return (
-    <div className="flex justify-center w-full">
-      <div className="w-full max-w-4xl border border-gray-200 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200">
-        <Link
-          href={`/reviews?id=${currentProduct?.id}`}
-          className="flex flex-col sm:flex-row items-start sm:space-x-3"
-        >
-          {currentProduct?.display_image && (
-            <div className="flex-shrink-0 w-full sm:w-auto mb-2 sm:mb-0">
-              <Image
-                src={currentProduct.display_image}
-                alt={`${currentProduct.name} Image`}
-                width={64}
-                height={64}
-                className="rounded-md object-cover w-full sm:w-16 h-16"
-              />
-            </div>
-          )}
-          <div className="flex flex-col min-w-0 w-full">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
-              {currentProduct?.name}
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 break-words flex items-center">
-              <MdLocationOn className="mr-1" /> {currentProduct?.address}
-            </p>
-            {currentProduct?.openingHrs && currentProduct?.closingHrs && (
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 flex items-center">
-                <MdAccessTime className="mr-1" /> Hours: {currentProduct.openingHrs} - {currentProduct.closingHrs}
-              </p>
-            )}
-            <div className="mt-1 text-xs sm:text-sm text-gray-600">
-              {currentProduct?.telephone && (
-                <p className="flex items-center">
-                  <MdPhone className="mr-1" /> {currentProduct.telephone}
-                </p>
-              )}
-              {currentProduct?.email && (
-                <p className="flex items-center">
-                  <MdEmail className="mr-1" /> {currentProduct.email}
-                </p>
-              )}
-            </div>
-            <p className="text-xs text-gray-500 mt-1 line-clamp-10 break-words">
-              {currentProduct?.description}
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              {allReviews.length > 0 ? (
-                <>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium text-white ${ratingColors[roundedRating as keyof typeof ratingColors]
-                      }`}
-                  >
-                    {roundedRatingOneDecimalPlace}
-                  </span>
-                  <RatingModuleReadOnly
-                    name={currentProduct?.id!}
-                    rating={roundedRating}
-                    size={options.size}
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover="hover"
+      className="w-full"
+    >
+      <div className="w-full max-w-4xl bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-150">
+        <div className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Image Section */}
+            {currentProduct?.display_image && (
+              <div className="flex-shrink-0">
+                <div className="relative w-full sm:w-32 h-32 rounded-lg overflow-hidden">
+                  <Image
+                    src={currentProduct.display_image}
+                    alt={`${currentProduct.name} Image`}
+                    layout="fill"
+                    objectFit="cover"
+                    className="transition-transform duration-200 group-hover:scale-105"
                   />
-                  <span className="text-xs text-gray-500">
-                    ({numberOfReviews} reviews)
-                  </span>
-                </>
+                </div>
+              </div>
+            )}
+
+            {/* Content Section */}
+            <div className="flex-grow min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-semibold text-gray-900 break-words">
+                      {currentProduct?.name}
+                    </h2>
+                    {currentProduct?.business && (
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                        <MdVerified className="mr-1" size={14} />
+                        Verified Business
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 flex items-center mt-1">
+                    <MdLocationOn className="shrink-0 mr-1" /> 
+                    <span className="truncate">{currentProduct?.address}</span>
+                  </p>
+                </div>
+
+                {/* Rating Section */}
+                <div className="flex items-center gap-2 sm:text-right">
+                  {allReviews.length > 0 ? (
+                    <>
+                      <span className={`px-2 py-1 rounded-full text-sm font-medium text-white ${
+                        ratingColors[roundedRating as keyof typeof ratingColors]
+                      }`}>
+                        {roundedRatingOneDecimalPlace}
+                      </span>
+                      <RatingModuleReadOnly
+                        name={currentProduct?.id!}
+                        rating={roundedRating}
+                        size={options.size}
+                      />
+                      <span className="text-sm text-gray-500">
+                        ({numberOfReviews} reviews)
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500">No reviews yet</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Details Section */}
+              <div className="mt-4 space-y-2">
+                {currentProduct?.openingHrs && currentProduct?.closingHrs && (
+                  <p className="text-sm text-gray-600 flex items-center">
+                    <MdAccessTime className="shrink-0 mr-1" /> 
+                    Hours: {currentProduct.openingHrs} - {currentProduct.closingHrs}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                  {currentProduct?.telephone && (
+                    <span className="flex items-center">
+                      <MdPhone className="shrink-0 mr-1" /> {currentProduct.telephone}
+                    </span>
+                  )}
+                  {currentProduct?.email && (
+                    <span className="flex items-center">
+                      <MdEmail className="shrink-0 mr-1" /> {currentProduct.email}
+                    </span>
+                  )}
+                </div>
+
+                {currentProduct?.description && (
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {currentProduct.description}
+                  </p>
+                )}
+
+                {/* Tags Section */}
+                {currentProduct?.tags && currentProduct.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {currentProduct.tags.slice(0, 4).map((tag, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="px-2 py-0.5 text-xs font-normal bg-gray-100 text-gray-600"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                    {currentProduct.tags.length > 4 && (
+                      <span className="text-xs text-gray-500">
+                        +{currentProduct.tags.length - 4} more
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Section */}
+        <div className="border-t border-gray-100 p-4 bg-gray-50 rounded-b-lg">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {currentProduct?.website && currentProduct.website.length > 0 && (
+                <a
+                  href={currentProduct.website[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center transition-colors"
+                >
+                  <MdLanguage className="mr-1" /> Visit Website
+                </a>
+              )}
+              <span className="text-sm text-gray-500 flex items-center">
+                <MdCalendarToday className="mr-1" /> 
+                Added: {new Date(currentProduct?.createdDate!).toLocaleDateString()}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {options.showClaimThisProduct && currentProduct?.businessId === null && (
+                <ClaimProductComponent product={currentProduct} />
+              )}
+              {options.showWriteReview ? (
+                <Link href={`/cr/?id=${currentProduct?.id}&rating=3`}>
+                  <Button 
+                    variant="default"
+                    size="sm"
+                    className="flex items-center gap-1 bg-black hover:bg-gray-800 text-white"
+                  >
+                    <MdEdit size={16} />
+                    Write Review
+                  </Button>
+                </Link>
               ) : (
-                <span className="text-xs text-gray-500">No Reviews Yet</span>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                >
+                  <MdReport size={16} />
+                  Report Product
+                </Button>
               )}
             </div>
-            {currentProduct?.website && currentProduct.website.length > 0 && (
-              <a
-                href={currentProduct.website[0]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-xs mt-2 flex items-center"
-              >
-                <MdLanguage className="mr-1" /> Visit Website
-              </a>
-            )}
-            <p className="text-xs text-gray-500 mt-1 flex items-center">
-              <MdCalendarToday className="mr-1" /> Added on: {currentProduct?.createdDate ? new Date(currentProduct.createdDate).toLocaleDateString() : 'N/A'}
-            </p>
-          </div>
-        </Link>
-        <div className="mt-3 flex flex-wrap items-center justify-between text-xs gap-2">
-          <VerticalLinks />
-          <div className="flex gap-2 justify-end items-center text-sm">
-            {options.showClaimThisProduct && (currentProduct?.businessId === null) && <ClaimProductComponent product={currentProduct} />}
-            {options.showWriteReview ? (
-              <Link
-                href={`/cr/?id=${currentProduct?.id}&rating=3`}
-                className="text-blue-600 hover:underline w-full h-full flex items-center"
-              >
-                <MdEdit className="mr-1" /> Write Review
-              </Link>
-            ) : (
-              <button className="text-red-600 hover:underline flex items-center">
-                <MdReport className="mr-1" /> Report Product
-              </button>
-            )}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

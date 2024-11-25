@@ -53,8 +53,8 @@ const Reviews = ({ productId }: { productId: string }) => {
     );
   }
   return (
-    <div className="flex flex-col w-full h-full p-2  sm:pt-8 ">
-      <div className="flex w-full ">
+    <div className="flex flex-col items-center w-full h-full p-2 sm:pt-8">
+      <div className="w-full max-w-4xl mx-auto">
         <ProductCard
           reviews={reviews}
           options={productCardOptions}

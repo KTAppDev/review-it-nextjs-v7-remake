@@ -58,19 +58,20 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
 
   // Animation variants for the card
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.2,
         ease: "easeOut"
       }
     },
     hover: {
-      y: -5,
+      y: -2,
       transition: {
-        duration: 0.2
+        duration: 0.15,
+        ease: "easeInOut"
       }
     }
   };
@@ -81,7 +82,7 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
       initial="hidden"
       animate="visible"
       whileHover="hover"
-      className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition-all duration-200 w-full relative group"
+      className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition-all duration-150 w-full relative group"
     >
       {/* Header Section */}
       <div className="flex items-start space-x-4 mb-4">
@@ -152,6 +153,7 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({ review }) => {
       <motion.div
         initial={false}
         animate={{ height: isExpanded ? "auto" : "auto" }}
+        transition={{ duration: 0.15, ease: "easeInOut" }}
         className="overflow-hidden"
       >
         <h3 className="font-semibold text-gray-800 mb-3">

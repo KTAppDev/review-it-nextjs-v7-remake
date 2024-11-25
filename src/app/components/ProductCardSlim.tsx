@@ -1,14 +1,15 @@
 "use client";
-import { iProduct, iReview } from "@/app/util/Interfaces"; // Update with the actual path
+import { iProduct, iReview } from "@/app/util/Interfaces";
 import Image from "next/legacy/image";
 import RatingModuleMini from "./RatingModuleMini";
-import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getReviews } from "../util/serverFunctions";
 import { calculateAverageReviewRating } from "../util/calculateAverageReviewRating";
 import LoadingSpinner from "./LoadingSpinner";
-import { Rating } from "@mantine/core";
+import { motion } from "framer-motion";
+import { MdLocationOn, MdPhone } from "react-icons/md";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   product: iProduct;
@@ -16,105 +17,160 @@ interface ProductCardProps {
     size: string;
   };
 }
+
 interface iCalculatedRating {
   roundedRating: number;
   roundedRatingOneDecimalPlace: number;
   numberOfReviews: number;
 }
 
-const ProductCardSlim: React.FC<ProductCardProps> = ({ product, options }) => {
-  const [_, setRating] = useState(0);
-  const ratingChanged = (newRating: number) => {
-    setRating(newRating);
-  };
+const ratingColors = {
+  1: "bg-red-500",
+  2: "bg-orange-500",
+  3: "bg-yellow-500",
+  4: "bg-lime-500",
+  5: "bg-green-500",
+};
 
+const ProductCardSlim: React.FC<ProductCardProps> = ({ product, options }) => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["reviews", product.id],
     queryFn: () => getReviews(product.id!),
     refetchOnWindowFocus: false,
   }) as any;
 
-  const reviews = data?.data.reviews as iReview[];
   if (isLoading) return <LoadingSpinner />;
-  if (isError) return <p>{error.message}</p>;
-  let { roundedRating, roundedRatingOneDecimalPlace, numberOfReviews } =
+  if (isError) return <p className="text-sm text-red-500">{error.message}</p>;
+
+  const reviews = data?.data.reviews as iReview[];
+  const { roundedRating, roundedRatingOneDecimalPlace, numberOfReviews } =
     calculateAverageReviewRating(reviews) as unknown as iCalculatedRating;
 
-  let productAddress = "";
-  let productDescription = "";
-  if (product.address) {
-    productAddress = product.address;
-  }
-  if (product.description) {
-    productDescription = product.description;
-  }
+  const cardVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut"
+      }
+    },
+    hover: {
+      y: -2,
+      transition: {
+        duration: 0.15,
+        ease: "easeInOut"
+      }
+    }
+  };
+
   return (
-    <div className="flex w-full flex-col items-start justify-start rounded-lg bg-myTheme-lightbg p-1 text-myTheme-lightTextBody shadow-md hover:bg-myTheme-success ">
-      <Link
-        href={`/reviews?id=${product.id}`}
-        className="  w-full"
-      >
-        <div className="flex h-full items-center justify-start gap-2">
-          {product.display_image && (
-            <div className="flex h-20 w-20 items-center justify-center object-cover">
-              <Image
-                src={product.display_image}
-                alt={`${product.name} Image`}
-                className=" h-16 w-16 rounded-lg object-contain"
-                width={64}
-                height={64}
-              />
-            </div>
-          )}
-          <div className="flex h-full w-full items-center justify-start">
-            <div className="flex w-full flex-col">
-              <p className="text-left text-sm font-semibold text-black ">
-                {product.name}
-              </p>
-              <div className="flex items-center justify-start gap-1 text-[10px] font-thin text-myTheme-lightTextBody  sm:text-xs ">
-                <div className="flex flex-nowrap items-center justify-start text-left">
-                  {productAddress.length > 40
-                    ? productAddress.slice(0, 40) + "..."
-                    : productAddress}
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover="hover"
+      className="w-full"
+    >
+      <Link href={`/reviews?id=${product.id}`}>
+        <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm hover:shadow-md transition-all duration-150">
+          <div className="flex gap-3">
+            {/* Image */}
+            {product.display_image && (
+              <div className="flex-shrink-0">
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                  <Image
+                    src={product.display_image}
+                    alt={`${product.name} Image`}
+                    layout="fill"
+                    objectFit="cover"
+                    className="transition-transform duration-200 group-hover:scale-105"
+                  />
                 </div>
               </div>
-              <div className="text-left text-[10px] font-thin text-myTheme-lightTextBody  sm:text-xs ">
-                {/* {product.telephone !== null ? "# " : ""} */}
-                {productDescription.length > 80
-                  ? productDescription.slice(0, 80) + "..."
-                  : productDescription}
+            )}
+
+            {/* Content */}
+            <div className="flex-grow min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
+                <div>
+                  <h3 className="font-medium text-gray-900 line-clamp-1">
+                    {product.name}
+                  </h3>
+                  
+                  {product.address && (
+                    <p className="text-sm text-gray-600 flex items-center mt-0.5">
+                      <MdLocationOn className="shrink-0 mr-1" size={14} />
+                      <span className="truncate">{product.address}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center gap-1.5 sm:text-right">
+                  {roundedRating ? (
+                    <>
+                      <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium text-white ${
+                        ratingColors[roundedRating as keyof typeof ratingColors]
+                      }`}>
+                        {roundedRatingOneDecimalPlace}
+                      </span>
+                      <RatingModuleMini
+                        name={product.id!}
+                        rating={roundedRating}
+                        size={options.size}
+                      />
+                      <span className="text-xs text-gray-500">
+                        ({numberOfReviews})
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-gray-500">No reviews yet</span>
+                  )}
+                </div>
               </div>
-              <div className="text-left text-[10px] font-thin text-myTheme-lightTextBody  sm:text-xs ">
-                {/* {product.telephone !== null ? "# " : ""} */}
-                {product.telephone}
+
+              {/* Details */}
+              <div className="mt-1 space-y-1">
+                {product.description && (
+                  <p className="text-sm text-gray-600 line-clamp-1">
+                    {product.description}
+                  </p>
+                )}
+
+                {product.telephone && (
+                  <p className="text-sm text-gray-600 flex items-center">
+                    <MdPhone className="shrink-0 mr-1" size={14} />
+                    {product.telephone}
+                  </p>
+                )}
+
+                {/* Tags */}
+                {product.tags && product.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {product.tags.slice(0, 2).map((tag, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="px-1.5 py-0 text-xs font-normal bg-gray-100 text-gray-600"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                    {product.tags.length > 2 && (
+                      <span className="text-xs text-gray-500">
+                        +{product.tags.length - 2} more
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
-          <div className="flex h-full w-auto flex-col items-start justify-start ">
-            <div className="flex  h-auto w-auto items-start justify-center">
-              <p className="text-cente text-[10px] font-thin text-myTheme-lightTextBody/50 ">
-                {numberOfReviews ? numberOfReviews : 0} reviews
-              </p>
-            </div>
-            <div className="flex  h-auto w-auto items-center justify-start gap-1 ">
-              {roundedRating ? (
-                <RatingModuleMini
-                  name={product.id!}
-                  rating={roundedRating!}
-                  ratingChanged={ratingChanged}
-                  size={options.size}
-                />
-              ) : (
-                ""
-              )}
-              <p className="flex items-start justify-start text-xs font-semibold text-myTheme-lightTextBody ">
-                {roundedRatingOneDecimalPlace}
-              </p>
             </div>
           </div>
         </div>
       </Link>
-    </div>
+    </motion.div>
   );
 };
 
