@@ -1,4 +1,6 @@
 // app/offline/page.js
+'use client';
+
 import React from "react";
 
 const OfflinePage = () => {
@@ -21,10 +23,10 @@ const OfflinePage = () => {
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">You're Offline</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">You&apos;re Offline</h1>
         <p className="text-gray-600 mb-6">
           Please check your internet connection and try again. Some features may be
-          limited while you're offline.
+          limited while you&apos;re offline.
         </p>
         <button
           onClick={() => window.location.reload()}
